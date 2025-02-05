@@ -17,6 +17,7 @@ public class Pharmacy implements Stockable {
         this.productList.add(
                 new Product(productName, price, quantity, category)
         );
+        System.out.println(productName + " has been successfully added.");
     }
 
     @Override
@@ -42,13 +43,44 @@ public class Pharmacy implements Stockable {
     }
 
     public void displayProducts() {
-        productList.sort(Comparator.comparing(Product::getName));
+        System.out.println("Products : ");
 
+        productList.sort(Comparator.comparing(Product::getName));
         for (Product product : productList) {
             System.out.println(product.getName());
         }
     }
+
+    public void displayLowStock() {
+        List<Product> lowStockProducts = new ArrayList<>();
+
+        for (Product p : productList) {
+            if (p.getQuantity() < 5) {
+                lowStockProducts.add(p);
+            }
+        }
+
+        //sorting algorithm by insertion
+        for (int i = 1; i < lowStockProducts.size(); i++) {
+            Product currentProduct = lowStockProducts.get(i);
+            int j = i - 1;
+
+            while (j >= 0 && lowStockProducts.get(j).getQuantity() > currentProduct.getQuantity()) {
+                lowStockProducts.set(j + 1, lowStockProducts.get(j));
+                j--;
+            }
+
+            lowStockProducts.set(j + 1, currentProduct);
+        }
+
+        System.out.println("Products with low stock : ");
+        for (Product p : lowStockProducts) {
+            System.out.println(p.getQuantity() + " : " + p.getName());
+        }
+
+    }
 }
+
 
 
 
