@@ -7,6 +7,8 @@ public class Main {
         p.addProduit("Smecta", 4.99, 2, "Medicine");
         p.addProduit("Aspirine", 9.99, 3, "Medicine");
 
+        p.removeProduct("Smecta");
+
         p.displayProducts();
     }
 }

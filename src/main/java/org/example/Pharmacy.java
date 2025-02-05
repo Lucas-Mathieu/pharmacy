@@ -19,6 +19,11 @@ public class Pharmacy implements Stockable {
                 ));
     }
 
+    @Override
+    public void removeProduct(String productName) {
+        productList.removeIf(p -> p.getName().equalsIgnoreCase(productName));
+    }
+
     public void displayProducts() {
         productList.sort(Comparator.comparing(Product::getName));
 
