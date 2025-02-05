@@ -79,6 +79,42 @@ public class Pharmacy implements Stockable {
         }
 
     }
+
+    public void searchProduct(String productName) {
+        productList.sort(Comparator.comparing(Product::getName));
+
+        int left = 0, right = productList.size() - 1;
+
+        // Loop to implement Binary Search
+        while (left <= right) {
+
+            // Calculatiing mid
+            int mid = left + (right - left) / 2;
+
+            int res = productName.compareTo(productList.get(mid).getName());
+
+            // Check if productName is present at mid
+            if (res == 0)
+                if (productList.get(mid).getQuantity() > 0) {
+                    System.out.println("the product " + productList.get(mid).getName() + " is in stock with " + productList.get(mid).getQuantity() + " units.");
+                    return;
+                }
+                else {
+                    System.out.println("The product " + productList.get(mid).getName() + " is not in stock.");
+                    return;
+                }
+
+            // If productName greater, ignore left half
+            if (res > 0)
+                left = mid + 1;
+
+            // If productName is smaller, ignore right half
+            else
+                left = mid - 1;
+        }
+
+        System.out.println("The product " + productName + " could not be found.");
+    }
 }
 
 
