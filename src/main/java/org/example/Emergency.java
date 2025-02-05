@@ -1,20 +1,18 @@
+package org.example;
+
+import org.example.Product;
+
 import java.util.List;
 
 public class Emergency extends Order {
 
 
-    @Override
-    public List<Product> getOrder() {
-        return orderList;
-    }
-
-    @Override
-    public void removeProduct(Product product) {
-        orderList.remove(product);
+    public Emergency(Pharmacy p) {
+        super(p);
     }
 
     @Override
     public boolean isUrgent() {
-        return true;
+        return false;
     }
 }
