@@ -15,8 +15,8 @@ public class Pharmacy implements Stockable {
     @Override
     public void addProduit(String productName, double price, int quantity, String category) {
         this.productList.add(
-                new Product(productName, price, quantity, category
-                ));
+                new Product(productName, price, quantity, category)
+        );
     }
 
     @Override
