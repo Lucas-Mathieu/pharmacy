@@ -1,4 +1,5 @@
 package org.example;
 
-public interface role {
+public interface Role {
+    String getRoleName();
 }
