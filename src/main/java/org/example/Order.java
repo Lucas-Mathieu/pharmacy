@@ -2,24 +2,31 @@ package org.example;
 import java.util.*;
 
 public abstract class Order {
+    private String name;
+    protected Map<Product, Integer> orderMap =  new HashMap<>();
+    private List<Product> pharmacyList;
 
-    protected  Map<Product, Integer> orderMap =  new HashMap<>();
-    private  List<Product> pharmacyList;
-
-    public  Order(Pharmacy p) {
-
+    public Order(Pharmacy p, String name) {
+        this.name = name;
         if (p == null) {
-            throw new IllegalArgumentException("❌ the pharmacy can't be null !");
+            throw new IllegalArgumentException("Error: the pharmacy can't be null !");
         }
         pharmacyList = p.getProductList();
     }
 
-    private boolean checkQuantity(int a, int b ) {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    private boolean checkQuantity(int a, int b) {
         return a > b;
     }
 
     private boolean alreadyInMap(String name) {
-
         for (Product p : orderMap.keySet()) {
             if (p.getName().contains(name)) {
                 return true;
@@ -28,8 +35,7 @@ public abstract class Order {
         return false;
     }
 
-    private Product getProduct(String name){
-
+    private Product getProduct(String name) {
         for (Product p : pharmacyList) {
             if (p.getName().equals(name)) {
                 return p;
@@ -38,46 +44,60 @@ public abstract class Order {
         return null;
     }
 
-    public boolean setOrder(String name, int quantity){
+    public boolean setOrder(String name, int quantity) {
 
         if (alreadyInMap(name)) {
             orderMap.get(getProduct(name));
-            System.out.println("quantity of the product : " + name + " have been changed for quantity : " + quantity);
+            System.out.println("Quantity of the product : " + name + " has been changed to quantity : " + quantity);
             return true;
         }
 
-        if ( getProduct(name) == null ){
-            System.out.println("error the product is not in the pharmacy");
+        if (getProduct(name) == null) {
+            System.out.println("Error: the product is not in the pharmacy.");
             return false;
         }
 
         final Product product = getProduct(name);
 
-        if(!checkQuantity(product.getQuantity(),quantity)){
-            System.out.println("the required quantity is too much");
+        if (!checkQuantity(product.getQuantity(), quantity)) {
+            System.out.println("The required quantity is too much.");
             return false;
         }
 
-        orderMap.put(product,quantity);
+        orderMap.put(product, quantity);
         return true;
     }
 
-    public  Map<Product, Integer> getOrder(){
+    public Map<Product, Integer> getOrder() {
         return orderMap;
     }
 
-    public void displayOrder(){
+    public void displayOrder() {
         for (Product p : orderMap.keySet()) {
-            System.out.println("name : " + p.getName() + "  quantity : " + orderMap.get(p));
+            System.out.println("Name : " + p.getName() + "  Quantity : " + orderMap.get(p));
         }
     }
 
-    public  boolean removeOrder(String name){
-        if (!alreadyInMap(name)) {
-            System.out.println("error the product is not in the order");
-            return  false;
+    public void validation(){
+
+        for (Product p : orderMap.keySet()){
+            p.setQuantity(p.getQuantity() - orderMap.get(p));
+            if(p.getQuantity() < 5 ) {
+                System.out.println("Warning ! The product quantity of name : " + p.getName() + " have decreased under 5 items ! New quantity : " + p.getQuantity() );
+            }
         }
-        orderMap.keySet().removeIf(ps ->ps.getName().equals(name));
+        System.out.println("validation of the order  is complete");
+    }
+
+    public boolean removeProductOrder(String name) {
+        if (!alreadyInMap(name)) {
+            System.out.println("Error: the product is not in the order.");
+            return false;
+        }
+
+        orderMap.keySet().removeIf(ps -> ps.getName().equals(name));
+        System.out.println("The product " + name + " has been removed from the order.");
+        // Save orders after the product is removed
         return true;
     }
 
