@@ -46,25 +46,25 @@ public abstract class Order {
 
     public boolean setOrder(String name, int quantity) {
 
+        final Product product = getProduct(name);
+
+        if (product == null) {
+            System.out.println("error, the product is not in the pharmacy");
+            return false;
+        }
+
         if (alreadyInMap(name)) {
-            orderMap.get(getProduct(name));
-            System.out.println("Quantity of the product : " + name + " has been changed to quantity : " + quantity);
+            orderMap.put(new Product(product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
+            System.out.println("the quantity of the product : " + name + " have been changed for quantity : " + quantity);
             return true;
         }
 
-        if (getProduct(name) == null) {
-            System.out.println("Error: the product is not in the pharmacy.");
+        if(!checkQuantity(product.getQuantity(),quantity)){
+            System.out.println("the required quantity is too much");
             return false;
         }
 
-        final Product product = getProduct(name);
-
-        if (!checkQuantity(product.getQuantity(), quantity)) {
-            System.out.println("The required quantity is too much.");
-            return false;
-        }
-
-        orderMap.put(product, quantity);
+        orderMap.put(new Product(product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
         return true;
     }
 
