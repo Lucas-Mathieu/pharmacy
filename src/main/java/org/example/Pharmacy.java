@@ -21,25 +21,30 @@ public class Pharmacy implements Stockable {
     }
 
     @Override
-    public void removeProduct(String productName) {
+    public void removeProduct(String identifier) {
         Scanner scanner = new Scanner(System.in);
+        Product productToRemove = null;
 
         for (Product p : productList) {
-            if (p.getName().equalsIgnoreCase(productName)) {
-                System.out.print("Are you sure you want to remove '" + productName + "' ? (yes/no) : ");
-
-                String response = scanner.nextLine().trim().toLowerCase();
-
-                if (response.equals("yes") || response.equals("y")) {
-                    productList.remove(p);
-                    System.out.println(productName + " has been removed.");
-                } else {
-                    System.out.println("Deletion aborted.");
-                }
-                return;
+            if (p.getName().equalsIgnoreCase(identifier) || String.valueOf(p.getId()).equals(identifier)) {
+                productToRemove = p;
+                break;
             }
         }
-        System.out.println("Product " + productName + " not found");
+
+        if (productToRemove != null) {
+            System.out.print("Are you sure you want to remove '" + productToRemove.getName() + "' ? (yes/no) : ");
+            String response = scanner.nextLine().trim().toLowerCase();
+
+            if (response.equals("yes") || response.equals("y")) {
+                productList.remove(productToRemove);
+                System.out.println(productToRemove.getName() + " has been removed.");
+            } else {
+                System.out.println("Deletion aborted.");
+            }
+        } else {
+            System.out.println("Product " + identifier + " not found");
+        }
     }
 
     public void displayProducts() {
@@ -110,7 +115,7 @@ public class Pharmacy implements Stockable {
 
             // If productName is smaller, ignore right half
             else
-                left = mid - 1;
+                right = mid - 1;
         }
 
         System.out.println("The product " + productName + " could not be found.");
