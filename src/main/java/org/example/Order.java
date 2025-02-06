@@ -61,7 +61,7 @@ public abstract class Order {
         orderMap.put(new Product(product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
     }
 
-    public  Map<Product, Integer> getOrder(){
+    public Map<Product, Integer>  getOrder(){
         return orderMap;
     }
 
