@@ -38,6 +38,12 @@ public abstract class Order {
         return null;
     }
 
+    public void clearOrder(){
+        orderMap.clear();
+        System.out.println("order cleared");
+
+    }
+
     public void setOrder(String name, int quantity){
 
         final Product product = getProduct(name);
@@ -62,6 +68,7 @@ public abstract class Order {
     }
 
     public  Map<Product, Integer> getOrder(){
+
         return orderMap;
     }
 
