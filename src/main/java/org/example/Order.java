@@ -44,7 +44,7 @@ public abstract class Order {
         return null;
     }
 
-    public boolean setOrder(String name, int quantity) {
+    public boolean setOrder(Pharmacy p, String name, int quantity) {
 
         final Product product = getProduct(name);
 
@@ -54,7 +54,7 @@ public abstract class Order {
         }
 
         if (alreadyInMap(name)) {
-            orderMap.put(new Product(product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
+            orderMap.put(new Product(p.getNewId(), product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
             System.out.println("the quantity of the product : " + name + " have been changed for quantity : " + quantity);
             return true;
         }
@@ -64,7 +64,7 @@ public abstract class Order {
             return false;
         }
 
-        orderMap.put(new Product(product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
+        orderMap.put(new Product(p.getNewId(), product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
         return true;
     }
 
@@ -74,7 +74,7 @@ public abstract class Order {
 
     public void displayOrder() {
         for (Product p : orderMap.keySet()) {
-            System.out.println("Name : " + p.getName() + "  Quantity : " + orderMap.get(p));
+            System.out.println("Product : " + p.getName() + "  Quantity : " + orderMap.get(p));
         }
     }
 

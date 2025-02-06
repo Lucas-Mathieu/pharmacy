@@ -23,7 +23,6 @@ public class Data implements Serializable {
             pharmacyData.put("name", pharmacy.getName());
             pharmacyData.put("address", pharmacy.getAddress());
 
-            // Save products
             List<Map<String, Object>> productData = new ArrayList<>();
             for (Product product : pharmacy.getProductList()) {
                 Map<String, Object> productMap = new HashMap<>();
@@ -36,7 +35,6 @@ public class Data implements Serializable {
             }
             pharmacyData.put("productList", productData);
 
-            // Save orders
             List<Map<String, Object>> orderData = new ArrayList<>();
             for (Order order : pharmacy.getOrderList()) {
                 Map<String, Object> orderMap = new HashMap<>();
@@ -75,7 +73,7 @@ public class Data implements Serializable {
                 int quantity = productJson.get("quantity").getAsInt();
                 String category = productJson.get("category").getAsString();
 
-                pharmacy.addProduct(productName, price, quantity, category);
+                pharmacy.addProductWithoutSaving(productName, price, quantity, category);
             }
 
             JsonArray orderArray = pharmacyJson.getAsJsonArray("orderList");
@@ -95,7 +93,7 @@ public class Data implements Serializable {
                     Product product = pharmacy.getProduct(productName);
 
                     if (product != null) {
-                        order.setOrder(productName, quantity);
+                        order.setOrder(pharmacy, productName, quantity);
                     } else {
                         System.out.println("Warning: Product '" + productName + "' not found while loading orders.");
                     }

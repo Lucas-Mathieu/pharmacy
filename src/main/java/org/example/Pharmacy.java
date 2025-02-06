@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Pharmacy extends Data implements Stockable {
     private String name;
     private String address;
-    private List<Product> productList;
+    public List<Product> productList;
     private List<Order> orderList;
 
     public Pharmacy(String name, String address) {
@@ -16,7 +16,6 @@ public class Pharmacy extends Data implements Stockable {
         this.address = address;
         this.productList = new ArrayList<>();
         this.orderList = new ArrayList<>();
-        Data.savePharmacy(this);
     }
 
     public List<Order> getOrderList() {
@@ -39,14 +38,31 @@ public class Pharmacy extends Data implements Stockable {
         this.address = address;
     }
 
+    public int getNewId() {
+        if (productList.isEmpty()) {
+            return 1;
+        } else {
+            return productList.get(productList.size() - 1).getId() + 1; // Corrected index
+        }
+    }
+
     @Override
     public void addProduct(String productName, double price, int quantity, String category) {
         this.productList.add(
-                new Product(productList.size() + 1, productName, price, quantity, category)
+                new Product(getNewId(), productName, price, quantity, category)
         );
         Data.savePharmacy(this);
         System.out.println(productName + " has been successfully added.");
     }
+
+    public void addProductWithoutSaving(String productName, double price, int quantity, String category) {
+        this.productList.add(
+                new Product(getNewId(), productName, price, quantity, category)
+        );
+        // Do not call savePharmacy here to avoid resetting orderList
+        System.out.println(productName + " has been successfully added.");
+    }
+
 
     @Override
     public void removeProduct(String identifier) {
@@ -225,10 +241,10 @@ public class Pharmacy extends Data implements Stockable {
         }
     }
 
-    public void setProductToOrder(String orderName, String productName, int quantity) {
+    public void setProductToOrder(Pharmacy p,String orderName, String productName, int quantity) {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
-                order.setOrder(productName, quantity);
+                order.setOrder(p, productName, quantity);
                 Data.savePharmacy(this);
                 return;
             }

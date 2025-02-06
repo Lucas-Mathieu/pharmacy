@@ -12,6 +12,7 @@ public class Main {
         p.addProduct("Supo ;)", 1.99, 3, "Medicine");
         p.addProduct("Dentifrice", 4.99, 3, "Hygiene");
         p.addProduct("Shampoing", 9.99, 2, "Hygiene");
+        */
 
         //p.removeProduct("Smecta");
 
@@ -23,34 +24,32 @@ public class Main {
         //p.searchProduct("Aspirine");
         //p.searchProduct("test");
 
+
+        Pharmacy p = Data.loadPharmacy();
+
+        /*
         p.addOrder("standard", "test");
-        p.setProductToOrder("test", "Smecta", 1);
-
+        p.setProductToOrder(p, "test", "Smecta", 1);
         p.addOrder("emergency", "test2");
-        p.setProductToOrder("test2", "Aspirine", 5);
-
-        p.displayOrders();
+        p.setProductToOrder(p, "test2", "Aspirine", 5);
         */
 
-        Pharmacy pharmacy = Data.loadPharmacy();
-
-        pharmacy.addProduct("test", 9.0, 5, "test");
 
         //p.displayProducts();
-        pharmacy.displayOrders();
+        //p.displayOrders();
 
-        Admin a = new Admin("monsieurPatate","patate");
-        UserConnexion u = new UserConnexion("t","t");
+        //Admin a = new Admin("monsieurPatate","patate");
+        //UserConnexion u = new UserConnexion("t","t");
 
         //System.out.println(a.getRoleName());
-        Employee em = new Employee("monsieurbanane","banane");
-        Employee em2 = new Employee("monsieurbanane2","banane2");
-        Admin admin = new Admin("admin","jsp");
+        //Employee em = new Employee("monsieurbanane","banane");
+        //Employee em2 = new Employee("monsieurbanane2","banane2");
+        //Admin admin = new Admin("admin","jsp");
 
 
-        UserManager um = new UserManager();
-        Scanner scanner = new Scanner(System.in);
-        Auth auth = new Auth();
+        //UserManager um = new UserManager();
+        //Scanner scanner = new Scanner(System.in);
+        //Auth auth = new Auth();
 
         //um.addUser(admin ,em);
         //um.addUser(admin ,em2);
