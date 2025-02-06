@@ -10,14 +10,14 @@ public class Main {
         p.addProduit("Dentifrice", 4.99, 3, "Hygiene");
         p.addProduit("Shampoing", 9.99, 2, "Hygiene");
 
-        //p.displayLowStock();
-
-        p.searchProduct("Shampoing");
-        //p.searchProduct("Aspirine");
-        //p.searchProduct("test");
-
-        //p.removeProduct("1");
+        //p.removeProduct("Smecta");
 
         //p.displayProducts();
+
+        //p.displayLowStock();
+
+        p.searchProduct("Smecta");
+        p.searchProduct("Aspirine");
+        p.searchProduct("test");
     }
 }

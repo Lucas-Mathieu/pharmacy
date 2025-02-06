@@ -47,6 +47,9 @@ public class Pharmacy implements Stockable {
         }
     }
 
+    public List<Product> getProductList() {
+        return productList;
+    }
     public void displayProducts() {
         System.out.println("Products : ");
 
