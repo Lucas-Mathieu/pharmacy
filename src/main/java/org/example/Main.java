@@ -1,6 +1,6 @@
 package org.example;
 
-import com.google.gson.Gson;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -32,10 +32,29 @@ public class Main {
         p.displayOrders();
         */
 
-        Pharmacy p = Data.loadPharmacy();
-        Data.loadOrders(p);
+        Pharmacy pharmacy = Data.loadPharmacy();
+        Data.loadOrders(pharmacy);
 
         //p.displayProducts();
-        p.displayOrders();
+        pharmacy.displayOrders();
+
+        Admin a = new Admin("monsieurPatate","patate");
+        UserConnexion u = new UserConnexion("t","t");
+
+        System.out.println(a.getRoleName());
+        Employee em = new Employee("monsieurbanane","banane");
+        System.out.println(em.getRoleName());
+
+        UserManager um = new UserManager();
+        Scanner scanner = new Scanner(System.in);
+        Auth auth = new Auth();
+        while (true) {
+            System.out.print("Enter username: ");
+            String username = scanner.nextLine();  // Read username
+            System.out.print("Enter password: ");
+            String password = scanner.nextLine();
+            System.out.print("wait for the check ... ");
+            auth.passwordVerify(username,password);
+        }
     }
 }
