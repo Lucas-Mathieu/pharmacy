@@ -4,7 +4,7 @@ import java.util.*;
 public abstract class Order {
 
     protected  Map<Product, Integer> orderMap =  new HashMap<>();
-    private  List<Product> pharmacyList;
+    private final List<Product> pharmacyList;
 
     public  Order(Pharmacy p) {
 
@@ -38,28 +38,27 @@ public abstract class Order {
         return null;
     }
 
-    public boolean setOrder(String name, int quantity){
-
-        if (alreadyInMap(name)) {
-            orderMap.get(getProduct(name));
-            System.out.println("quantity of the product : " + name + " have been changed for quantity : " + quantity);
-            return true;
-        }
-
-        if ( getProduct(name) == null ){
-            System.out.println("error the product is not in the pharmacy");
-            return false;
-        }
+    public void setOrder(String name, int quantity){
 
         final Product product = getProduct(name);
 
-        if(!checkQuantity(product.getQuantity(),quantity)){
-            System.out.println("the required quantity is too much");
-            return false;
+        if (product == null) {
+            System.out.println("error, the product is not in the pharmacy");
+            return;
         }
 
-        orderMap.put(product,quantity);
-        return true;
+        if (alreadyInMap(name)) {
+            orderMap.put(new Product(product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
+            System.out.println("the quantity of the product : " + name + " have been changed for quantity : " + quantity);
+            return;
+        }
+
+        if(!checkQuantity(product.getQuantity(),quantity)){
+            System.out.println("the required quantity is too much");
+            return;
+        }
+
+        orderMap.put(new Product(product.getName(), product.getPrice(), product.getQuantity(), product.getCategory()),quantity);
     }
 
     public  Map<Product, Integer> getOrder(){
@@ -72,13 +71,24 @@ public abstract class Order {
         }
     }
 
-    public  boolean removeOrder(String name){
+    public  void removeOrder(String name){
+
         if (!alreadyInMap(name)) {
-            System.out.println("error the product is not in the order");
-            return  false;
+            System.out.println("error, the product is not in the order");
+            return;
         }
         orderMap.keySet().removeIf(ps ->ps.getName().equals(name));
-        return true;
+    }
+
+    public void validation(){
+
+        for (Product p : orderMap.keySet()){
+            p.setQuantity(p.getQuantity() - orderMap.get(p));
+            if(p.getQuantity() < 5 ) {
+                System.out.println("Warning ! The product quantity of name : " + p.getName() + " have decreased under 5 items ! New quantity : " + p.getQuantity() );
+            }
+        }
+        System.out.println("validation of the order  is complete");
     }
 
     public abstract boolean isUrgent();
