@@ -24,9 +24,22 @@ public class Main {
         Emergency e = new Emergency(p);
         System.out.println(s.isUrgent());
         System.out.println(e.isUrgent());
+
         s.setOrder("Aspirine",5);
         s.setOrder("Dentifrice",1);
         s.validation();
+
+        OrderLog ol = new OrderLog();
+        ol.addLog(s);
+        e.setOrder("Aspirine",5);
+        e.setOrder("Dentifrice",1);
+        e.validation();
+        for( int i = 0; i<50000; i++){
+
+        }
+        ol.addLog(e);
+
+        ol.displayLog();
 
         Admin a = new Admin("monsieurPatate","patate");
         UserConnexion u = new UserConnexion("t","t");
