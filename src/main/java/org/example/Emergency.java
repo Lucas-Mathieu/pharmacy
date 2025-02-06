@@ -13,6 +13,6 @@ public class Emergency extends Order {
 
     @Override
     public boolean isUrgent() {
-        return false;
+        return true;
     }
 }
