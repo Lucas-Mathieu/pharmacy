@@ -266,7 +266,7 @@ public class Data implements Serializable {
                 mostSoldProduct = entry.getKey();
             }
         }
-        
+
         try (FileWriter writer = new FileWriter("sales_report.csv")) {
             writer.write("Product Name,Quantity Sold,Revenue\n");
             for (Map.Entry<String, Integer> entry : salesByProduct.entrySet()) {
