@@ -1,4 +1,19 @@
 package org.example;
 
-public class Client {
+public class Client extends User implements Role {
+
+
+    public Client(String name, String password) {
+        super(name, password);
+    }
+
+    @Override
+    public String getPassword() {
+        return "";
+    }
+
+    @Override
+    public String getRoleName() {
+        return "client";
+    }
 }
