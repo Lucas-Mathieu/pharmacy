@@ -19,6 +19,10 @@ public class Pharmacy extends Data implements Stockable {
         Data.savePharmacy(this);
     }
 
+    public List<Order> getOrderList() {
+        return orderList;
+    }
+
     public String getName() {
         return name;
     }
@@ -38,7 +42,7 @@ public class Pharmacy extends Data implements Stockable {
     @Override
     public void addProduct(String productName, double price, int quantity, String category) {
         this.productList.add(
-                new Product(productName, price, quantity, category)
+                new Product(productList.size() + 1, productName, price, quantity, category)
         );
         Data.savePharmacy(this);
         System.out.println(productName + " has been successfully added.");
@@ -194,7 +198,7 @@ public class Pharmacy extends Data implements Stockable {
 
         // Add the order to the order list
         this.orderList.add(order);
-        Data.saveOrders(orderList);
+        Data.savePharmacy(this);
         System.out.println("The " + orderType + " order has been added.");
     }
 
@@ -202,7 +206,7 @@ public class Pharmacy extends Data implements Stockable {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 orderList.remove(order);
-                Data.saveOrders(orderList);
+                Data.savePharmacy(this);
                 System.out.println("Order '" + orderName + "' has been removed.");
                 return;
             }
@@ -225,7 +229,7 @@ public class Pharmacy extends Data implements Stockable {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 order.setOrder(productName, quantity);
-                Data.saveOrders(orderList);
+                Data.savePharmacy(this);
                 return;
             }
         }
@@ -236,7 +240,7 @@ public class Pharmacy extends Data implements Stockable {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 order.removeProductOrder(productName);
-                Data.saveOrders(orderList);
+                Data.savePharmacy(this);
                 return;
             }
         }
@@ -248,7 +252,7 @@ public class Pharmacy extends Data implements Stockable {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 order.validation();
                 this.orderList.remove(order);
-                Data.saveOrders(orderList);
+                Data.savePharmacy(this);
                 return;
             }
         }

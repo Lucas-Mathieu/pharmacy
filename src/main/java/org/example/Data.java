@@ -19,29 +19,26 @@ public class Data implements Serializable {
 
     public static void savePharmacy(Pharmacy pharmacy) {
         try (Writer writer = new FileWriter("src/main/java/org/example/pharmacy.json")) {
-            gson.toJson(pharmacy, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+            Map<String, Object> pharmacyData = new HashMap<>();
+            pharmacyData.put("name", pharmacy.getName());
+            pharmacyData.put("address", pharmacy.getAddress());
 
-    public static Pharmacy loadPharmacy() {
-        try (Reader reader = new FileReader("src/main/java/org/example/pharmacy.json")) {
-            return gson.fromJson(reader, Pharmacy.class);
-        } catch (FileNotFoundException e) {
-            System.out.println("No previous data found, starting fresh.");
-            return new Pharmacy("Pharmacy", "Unknown");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+            // Save products
+            List<Map<String, Object>> productData = new ArrayList<>();
+            for (Product product : pharmacy.getProductList()) {
+                Map<String, Object> productMap = new HashMap<>();
+                productMap.put("id", product.getId());
+                productMap.put("name", product.getName());
+                productMap.put("price", product.getPrice());
+                productMap.put("quantity", product.getQuantity());
+                productMap.put("category", product.getCategory());
+                productData.add(productMap);
+            }
+            pharmacyData.put("productList", productData);
 
-    public static void saveOrders(List<Order> orders) {
-        try (Writer writer = new FileWriter("src/main/java/org/example/orders.json")) {
+            // Save orders
             List<Map<String, Object>> orderData = new ArrayList<>();
-
-            for (Order order : orders) {
+            for (Order order : pharmacy.getOrderList()) {
                 Map<String, Object> orderMap = new HashMap<>();
                 orderMap.put("type", order instanceof Standard ? "standard" : "emergency");
                 orderMap.put("name", order.getName());
@@ -50,56 +47,66 @@ public class Data implements Serializable {
                 for (Map.Entry<Product, Integer> entry : order.getOrder().entrySet()) {
                     productQuantities.put(entry.getKey().getName(), entry.getValue());
                 }
-
                 orderMap.put("orderMap", productQuantities);
                 orderData.add(orderMap);
             }
+            pharmacyData.put("orderList", orderData);
 
-            gson.toJson(orderData, writer);
+            gson.toJson(pharmacyData, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static List<Order> loadOrders(Pharmacy pharmacy) {
-        try (Reader reader = new FileReader("src/main/java/org/example/orders.json")) {
-            Type type = new TypeToken<List<Map<String, Object>>>() {}.getType();
-            List<Map<String, Object>> rawOrders = gson.fromJson(reader, type);
-            List<Order> orders = new ArrayList<>();
+    public static Pharmacy loadPharmacy() {
+        try (Reader reader = new FileReader("src/main/java/org/example/pharmacy.json")) {
+            JsonObject pharmacyJson = gson.fromJson(reader, JsonObject.class);
 
-            for (Map<String, Object> rawOrder : rawOrders) {
-                String orderType = (String) rawOrder.get("type");
-                String orderName = (String) rawOrder.get("name");
-                Map<String, Double> productQuantities = (Map<String, Double>) rawOrder.get("orderMap");
+            String name = pharmacyJson.get("name").getAsString();
+            String address = pharmacyJson.get("address").getAsString();
+            Pharmacy pharmacy = new Pharmacy(name, address);
 
-                Order order;
-                if ("standard".equalsIgnoreCase(orderType)) {
-                    order = new Standard(pharmacy, orderName);
-                } else if ("emergency".equalsIgnoreCase(orderType)) {
-                    order = new Emergency(pharmacy, orderName);
-                } else {
-                    System.out.println("Unknown order type: " + orderType);
-                    continue;
-                }
+            JsonArray productArray = pharmacyJson.getAsJsonArray("productList");
+            for (JsonElement productElement : productArray) {
+                JsonObject productJson = productElement.getAsJsonObject();
+                int id = productJson.get("id").getAsInt();
+                String productName = productJson.get("name").getAsString();
+                double price = productJson.get("price").getAsDouble();
+                int quantity = productJson.get("quantity").getAsInt();
+                String category = productJson.get("category").getAsString();
 
-                for (Map.Entry<String, Double> entry : productQuantities.entrySet()) {
-                    String productName = entry.getKey().trim();
-                    int quantity = entry.getValue().intValue();
+                pharmacy.addProduct(productName, price, quantity, category);
+            }
 
+            JsonArray orderArray = pharmacyJson.getAsJsonArray("orderList");
+            for (JsonElement orderElement : orderArray) {
+                JsonObject orderJson = orderElement.getAsJsonObject();
+                String orderType = orderJson.get("type").getAsString();
+                String orderName = orderJson.get("name").getAsString();
+                JsonObject orderMap = orderJson.getAsJsonObject("orderMap");
+
+                Order order = "standard".equalsIgnoreCase(orderType)
+                        ? new Standard(pharmacy, orderName)
+                        : new Emergency(pharmacy, orderName);
+
+                for (Map.Entry<String, JsonElement> entry : orderMap.entrySet()) {
+                    String productName = entry.getKey();
+                    int quantity = entry.getValue().getAsInt();
                     Product product = pharmacy.getProduct(productName);
+
                     if (product != null) {
-                        pharmacy.addOrder(orderType, orderName);
-                        pharmacy.setProductToOrder(orderName, product.getName(), quantity);
+                        order.setOrder(productName, quantity);
                     } else {
-                        System.out.println("Product not found in pharmacy: " + productName);
+                        System.out.println("Warning: Product '" + productName + "' not found while loading orders.");
                     }
                 }
-                orders.add(order);
+                pharmacy.getOrderList().add(order);
             }
-            return orders;
+
+            return pharmacy;
         } catch (FileNotFoundException e) {
-            System.out.println("No previous orders found, starting fresh.");
-            return new ArrayList<>();
+            System.out.println("No previous data found, starting fresh.");
+            return new Pharmacy("Pharmacy", "Unknown");
         } catch (IOException e) {
             e.printStackTrace();
             return null;

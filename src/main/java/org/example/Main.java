@@ -33,7 +33,8 @@ public class Main {
         */
 
         Pharmacy pharmacy = Data.loadPharmacy();
-        Data.loadOrders(pharmacy);
+
+        pharmacy.addProduct("test", 9.0, 5, "test");
 
         //p.displayProducts();
         pharmacy.displayOrders();
@@ -51,11 +52,13 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         Auth auth = new Auth();
 
-        um.addUser(admin ,em);
-        um.addUser(admin ,em2);
+        //um.addUser(admin ,em);
+        //um.addUser(admin ,em2);
+
 
         //um.removeUser(admin, "monsieurbanane");
 
+        /*
         while (true) {
             System.out.print("Enter username: ");
             String username = scanner.nextLine();  // Read username
@@ -63,6 +66,6 @@ public class Main {
             String password = scanner.nextLine();
             System.out.print("wait for the check ... ");
             auth.passwordVerify(username,password);
-        }
+        }*/
     }
 }
