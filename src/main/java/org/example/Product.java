@@ -1,12 +1,15 @@
 package org.example;
 
 public class Product {
+    private static int nextId = 1;
+    private int id;
     private String name;
     private double price;
     private int quantity;
     private Category category;
 
     public Product(String name, double price, int quantity, String categoryName) {
+        this.id = nextId++;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
@@ -45,4 +48,7 @@ public class Product {
         this.category.setType(category);
     }
 
+    public int getId() {
+        return id;
+    }
 }

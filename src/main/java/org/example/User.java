@@ -23,6 +23,9 @@ public abstract class User {
         return password;
     }
 
+    public String getRoleName() {
+        return null;
+    }
 }
 
 

@@ -2,8 +2,8 @@ package org.example;
 
 public class Standard extends Order{
 
-    public Standard(Pharmacy p) {
-        super(p);
+    public Standard(Pharmacy p, String name) {
+        super(p, name);
     }
 
     @Override

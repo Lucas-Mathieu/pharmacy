@@ -7,8 +7,8 @@ import java.util.List;
 public class Emergency extends Order {
 
 
-    public Emergency(Pharmacy p) {
-        super(p);
+    public Emergency(Pharmacy p, String name) {
+        super(p, name);
     }
 
     @Override

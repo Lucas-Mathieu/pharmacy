@@ -13,7 +13,7 @@ public class Employee extends User implements Role {
 
     @Override
     public String getRoleName() {
-        return "Employee";
+        return "employee";
     }
 
 

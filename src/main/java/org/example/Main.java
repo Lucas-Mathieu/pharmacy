@@ -1,18 +1,17 @@
 package org.example;
-import com.google.gson.Gson;
 
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Gson gson = new Gson();
+        /*
+        Pharmacy p = new Pharmacy("Pharma-caca", "2 avenue de westphalie");
 
-        Pharmacy p = new Pharmacy();
-        p.addProduit("Smecta", 4.99, 0, "Medicine");
-        p.addProduit("Aspirine", 9.99, 10, "Medicine");
-        p.addProduit("Supo ;)", 1.99, 3, "Medicine");
-        p.addProduit("Dentifrice", 4.99, 3, "Hygiene");
-        p.addProduit("Shampoing", 9.99, 2, "Hygiene");
+        p.addProduct("Smecta", 4.99, 2, "Medicine");
+        p.addProduct("Aspirine", 9.99, 10, "Medicine");
+        p.addProduct("Supo ;)", 1.99, 3, "Medicine");
+        p.addProduct("Dentifrice", 4.99, 3, "Hygiene");
+        p.addProduct("Shampoing", 9.99, 2, "Hygiene");
 
         //p.removeProduct("Smecta");
 
@@ -20,28 +19,43 @@ public class Main {
 
         //p.displayLowStock();
 
-        Standard s = new Standard(p);
-        Emergency e = new Emergency(p);
-        System.out.println(s.isUrgent());
-        System.out.println(e.isUrgent());
-        s.setOrder("Aspirine",5);
-        s.setOrder("Dentifrice",1);
-        s.validation();
+        //p.searchProduct("Smecta");
+        //p.searchProduct("Aspirine");
+        //p.searchProduct("test");
+
+        p.addOrder("standard", "test");
+        p.setProductToOrder("test", "Smecta", 1);
+
+        p.addOrder("emergency", "test2");
+        p.setProductToOrder("test2", "Aspirine", 5);
+
+        p.displayOrders();
+        */
+
+        Pharmacy pharmacy = Data.loadPharmacy();
+        Data.loadOrders(pharmacy);
+
+        //p.displayProducts();
+        pharmacy.displayOrders();
 
         Admin a = new Admin("monsieurPatate","patate");
         UserConnexion u = new UserConnexion("t","t");
 
-        System.out.println(a.getRoleName());
+        //System.out.println(a.getRoleName());
         Employee em = new Employee("monsieurbanane","banane");
-        System.out.println(em.getRoleName());
+        Employee em2 = new Employee("monsieurbanane2","banane2");
+        Admin admin = new Admin("admin","jsp");
+
 
         UserManager um = new UserManager();
-
-        //p.searchProduct("Smecta");
-        //p.searchProduct("Aspirine");
-        //p.searchProduct("test");
         Scanner scanner = new Scanner(System.in);
         Auth auth = new Auth();
+
+        um.addUser(admin ,em);
+        um.addUser(admin ,em2);
+
+        //um.removeUser(admin, "monsieurbanane");
+
         while (true) {
             System.out.print("Enter username: ");
             String username = scanner.nextLine();  // Read username
@@ -49,7 +63,6 @@ public class Main {
             String password = scanner.nextLine();
             System.out.print("wait for the check ... ");
             auth.passwordVerify(username,password);
-
         }
     }
 }
