@@ -41,13 +41,21 @@ public class Main {
         Admin a = new Admin("monsieurPatate","patate");
         UserConnexion u = new UserConnexion("t","t");
 
-        System.out.println(a.getRoleName());
+        //System.out.println(a.getRoleName());
         Employee em = new Employee("monsieurbanane","banane");
-        System.out.println(em.getRoleName());
+        Employee em2 = new Employee("monsieurbanane2","banane2");
+        Admin admin = new Admin("admin","jsp");
+
 
         UserManager um = new UserManager();
         Scanner scanner = new Scanner(System.in);
         Auth auth = new Auth();
+
+        um.addUser(admin ,em);
+        um.addUser(admin ,em2);
+
+        //um.removeUser(admin, "monsieurbanane");
+
         while (true) {
             System.out.print("Enter username: ");
             String username = scanner.nextLine();  // Read username

@@ -11,7 +11,7 @@ public class UserManager {
 
         if ( user instanceof Admin ) {
             users.add(newUser);
-            System.out.println(newUser.getName() + " added as " + newUser);
+            Data.saveUser(newUser);
         } else {
             System.out.println("Error, Only admins can add users!");
         }
@@ -21,7 +21,7 @@ public class UserManager {
 
         if ( user instanceof Admin) {
             users.removeIf(u -> u.getName().equals(username));
-            System.out.println(username + " has been removed.");
+            Data.removeUser(username);
         } else {
             System.out.println("Error, Only admins can remove users!");
         }
@@ -37,4 +37,3 @@ public class UserManager {
 
     }
 }
-
