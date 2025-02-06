@@ -4,6 +4,10 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        Pharmacy p = Data.loadPharmacy();
+        p.displayOrdersSold();
+        p.genStats();
+
         /*
         Pharmacy p = new Pharmacy("Pharma-caca", "2 avenue de westphalie");
 
@@ -23,9 +27,6 @@ public class Main {
         //p.searchProduct("Smecta");
         //p.searchProduct("Aspirine");
         //p.searchProduct("test");
-
-
-        Pharmacy p = Data.loadPharmacy();
 
         /*
         p.addOrder("standard", "test");

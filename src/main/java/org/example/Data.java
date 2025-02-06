@@ -1,9 +1,7 @@
 package org.example;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +21,7 @@ public class Data implements Serializable {
             pharmacyData.put("name", pharmacy.getName());
             pharmacyData.put("address", pharmacy.getAddress());
 
+            // Save product list
             List<Map<String, Object>> productData = new ArrayList<>();
             for (Product product : pharmacy.getProductList()) {
                 Map<String, Object> productMap = new HashMap<>();
@@ -35,6 +34,7 @@ public class Data implements Serializable {
             }
             pharmacyData.put("productList", productData);
 
+            // Save orderList
             List<Map<String, Object>> orderData = new ArrayList<>();
             for (Order order : pharmacy.getOrderList()) {
                 Map<String, Object> orderMap = new HashMap<>();
@@ -50,6 +50,23 @@ public class Data implements Serializable {
             }
             pharmacyData.put("orderList", orderData);
 
+            // Save orderSold
+            List<Map<String, Object>> orderSoldData = new ArrayList<>();
+            for (Order order : pharmacy.getOrderSold()) {
+                Map<String, Object> orderMap = new HashMap<>();
+                orderMap.put("type", order instanceof Standard ? "standard" : "emergency");
+                orderMap.put("name", order.getName());
+
+                Map<String, Integer> productQuantities = new HashMap<>();
+                for (Map.Entry<Product, Integer> entry : order.getOrder().entrySet()) {
+                    productQuantities.put(entry.getKey().getName(), entry.getValue());
+                }
+                orderMap.put("orderMap", productQuantities);
+                orderSoldData.add(orderMap);
+            }
+            pharmacyData.put("orderSold", orderSoldData);
+
+            // Write to the file
             gson.toJson(pharmacyData, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,6 +81,7 @@ public class Data implements Serializable {
             String address = pharmacyJson.get("address").getAsString();
             Pharmacy pharmacy = new Pharmacy(name, address);
 
+            // Load product list
             JsonArray productArray = pharmacyJson.getAsJsonArray("productList");
             for (JsonElement productElement : productArray) {
                 JsonObject productJson = productElement.getAsJsonObject();
@@ -76,6 +94,7 @@ public class Data implements Serializable {
                 pharmacy.addProductWithoutSaving(productName, price, quantity, category);
             }
 
+            // Load orderList
             JsonArray orderArray = pharmacyJson.getAsJsonArray("orderList");
             for (JsonElement orderElement : orderArray) {
                 JsonObject orderJson = orderElement.getAsJsonObject();
@@ -101,6 +120,34 @@ public class Data implements Serializable {
                 pharmacy.getOrderList().add(order);
             }
 
+            // Load orderSold
+            JsonArray orderSoldArray = pharmacyJson.has("orderSold") ? pharmacyJson.getAsJsonArray("orderSold") : null;
+            if (orderSoldArray != null) {
+                for (JsonElement orderSoldElement : orderSoldArray) {
+                    JsonObject orderJson = orderSoldElement.getAsJsonObject();
+                    String orderType = orderJson.get("type").getAsString();
+                    String orderName = orderJson.get("name").getAsString();
+                    JsonObject orderMap = orderJson.getAsJsonObject("orderMap");
+
+                    Order order = "standard".equalsIgnoreCase(orderType)
+                            ? new Standard(pharmacy, orderName)
+                            : new Emergency(pharmacy, orderName);
+
+                    for (Map.Entry<String, JsonElement> entry : orderMap.entrySet()) {
+                        String productName = entry.getKey();
+                        int quantity = entry.getValue().getAsInt();
+                        Product product = pharmacy.getProduct(productName);
+
+                        if (product != null) {
+                            order.setOrder(pharmacy, productName, quantity);
+                        } else {
+                            System.out.println("Warning: Product '" + productName + "' not found while loading orders.");
+                        }
+                    }
+                    pharmacy.getOrderSold().add(order);  // Add to orderSold
+                }
+            }
+
             return pharmacy;
         } catch (FileNotFoundException e) {
             System.out.println("No previous data found, starting fresh.");
@@ -110,6 +157,7 @@ public class Data implements Serializable {
             return null;
         }
     }
+
 
     private static void loadUsers() {
         try (FileReader reader = new FileReader("src/main/java/org/example/users.json")) {
@@ -186,5 +234,50 @@ public class Data implements Serializable {
     public static void removeUser(String user) {
         users.removeIf(existingUser -> existingUser.getName().equals(user));
         saveUsers();
+    }
+
+    public static void exportSalesReport(Pharmacy p) {
+        if (p.getOrderSold().isEmpty()) {
+            System.out.println("No sales data available to export.");
+            return;
+        }
+
+        Map<String, Integer> salesByProduct = new HashMap<>();
+        Map<String, Double> revenueByProduct = new HashMap<>();
+        double totalRevenue = 0;
+        String mostSoldProduct = "";
+        int highestQuantity = 0;
+
+        for (Order order : p.getOrderSold()) {
+            for (Map.Entry<Product, Integer> entry : order.getOrder().entrySet()) {
+                Product product = entry.getKey();
+                int quantity = entry.getValue();
+                double price = product.getPrice();
+
+                salesByProduct.put(product.getName(), salesByProduct.getOrDefault(product.getName(), 0) + quantity);
+                revenueByProduct.put(product.getName(), revenueByProduct.getOrDefault(product.getName(), 0.0) + (quantity * price));
+                totalRevenue += quantity * price;
+            }
+        }
+
+        for (Map.Entry<String, Integer> entry : salesByProduct.entrySet()) {
+            if (entry.getValue() > highestQuantity) {
+                highestQuantity = entry.getValue();
+                mostSoldProduct = entry.getKey();
+            }
+        }
+        
+        try (FileWriter writer = new FileWriter("sales_report.csv")) {
+            writer.write("Product Name,Quantity Sold,Revenue\n");
+            for (Map.Entry<String, Integer> entry : salesByProduct.entrySet()) {
+                writer.write(entry.getKey() + "," + entry.getValue() + "," + revenueByProduct.get(entry.getKey()) + "\n");
+            }
+            writer.write("\nMost Sold Product: " + mostSoldProduct + " (" + highestQuantity + " units)\n");
+            writer.write("Total Revenue: " + totalRevenue + "\n");
+
+            System.out.println("Sales report exported successfully as 'sales_report.csv'.");
+        } catch (IOException e) {
+            System.out.println("Error exporting sales report: " + e.getMessage());
+        }
     }
 }

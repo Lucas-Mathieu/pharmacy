@@ -4,18 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Pharmacy extends Data implements Stockable {
     private String name;
     private String address;
     public List<Product> productList;
     private List<Order> orderList;
+    private List<Order> orderSold;
 
     public Pharmacy(String name, String address) {
         this.name = name;
         this.address = address;
         this.productList = new ArrayList<>();
         this.orderList = new ArrayList<>();
+        this.orderSold = new ArrayList<>();
     }
 
     public List<Order> getOrderList() {
@@ -36,6 +40,10 @@ public class Pharmacy extends Data implements Stockable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public List<Order> getOrderSold() {
+        return orderSold;
     }
 
     public int getNewId() {
@@ -241,6 +249,17 @@ public class Pharmacy extends Data implements Stockable {
         }
     }
 
+    public void displayOrdersSold() {
+        if (orderSold.isEmpty()) {
+            System.out.println("No orders found.");
+        } else {
+            for (Order order : orderSold) {
+                System.out.println("Order Name: " + order.getName() + " | Urgent: " + order.isUrgent());
+                order.displayOrder();
+            }
+        }
+    }
+
     public void setProductToOrder(Pharmacy p,String orderName, String productName, int quantity) {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
@@ -268,10 +287,16 @@ public class Pharmacy extends Data implements Stockable {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 order.validation();
                 this.orderList.remove(order);
+                this.orderSold.add(order);
                 Data.savePharmacy(this);
+                System.out.println("Order '" + orderName + "' has been validated and moved to orderSold.");
                 return;
             }
         }
         System.out.println("Order with name '" + orderName + "' not found.");
+    }
+
+    public void genStats() {
+        Data.exportSalesReport(this);
     }
 }
