@@ -18,10 +18,8 @@ public abstract class User {
         String stackedClass = stackTrace[2].getClassName();
         System.out.println(stackedClass);
         if (stackedClass.equals("org.example.Auth") || stackedClass.equals("org.example.Data") ){
-            System.out.println("you dont have acces to this method");
             return password;
         }
-        System.out.println("you dont have acces to this method");
         return null;
     }
 

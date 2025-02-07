@@ -144,7 +144,7 @@ class Menu {
             scanner.next();
         }
         int quantity = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         System.out.print("Enter category: ");
         String category = scanner.nextLine();
@@ -273,7 +273,6 @@ class Menu {
     }
 
     private void printGlobalMenu(String role) {
-        System.out.println("\n--- Main Menu ---");
         if (role.equals("admin")) {
             System.out.println("--------ADMIN MENU---------");
             System.out.println("7. Add user");

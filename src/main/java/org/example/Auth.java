@@ -27,23 +27,21 @@ public class Auth {
             e.printStackTrace();
         }
         for (UserConnexion user : users) {
-            if (!user.getName().equals(name)) {
-                System.out.println("user not found");
-                return false;
+            if (user.getName().equals(name)) {
+                if(user.getPassword() == null){
+                    System.out.println("incorrect acces to the method");
+                    return false;
+                }
+                if (!user.getPassword().equals(password)){
+                    System.out.println("incorrect password");
+                    return false;
+                }
+                session = createSession(user.getRoleName(),user.getName());
+                System.out.println("correct password");
+                return true;
             }
-            if(user.getPassword() == null){
-                System.out.println("incorrect acces to the method");
-                return false;
-            }
-            if (!user.getPassword().equals(password)){
-                System.out.println("incorrect password");
-                return false;
-            }
-            System.out.println("correct password");
-            System.out.println(user.getRoleName());
-            session = createSession(user.getRoleName(),user.getName());
-            return true;
         }
+        System.out.println("user not found");
         return false;
     }
     private User createSession(String role,String name){
