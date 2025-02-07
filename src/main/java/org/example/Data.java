@@ -16,12 +16,29 @@ public class Data implements Serializable {
     }
 
     public static void savePharmacy(Pharmacy pharmacy) {
+        /**
+         * Saves the given Pharmacy object to a JSON file.
+         *
+         * This method takes a Pharmacy object, serializes its data by extracting relevant fields,
+         * and replaces references to Product objects with their respective names in orders.
+         * The result is saved in JSON format and written to a file located at:
+         * "src/main/java/org/example/pharmacy.json".
+         *
+         * The JSON structure includes:
+         * - "name": The name of the pharmacy.
+         * - "address": The address of the pharmacy.
+         * - "productList": A list of products available in the pharmacy.
+         * - "orderList": A list of pending orders, including product names and their quantities.
+         * - "orderSold": A list of completed orders, also including product details.
+         *
+         * @param pharmacy The Pharmacy object to be serialized and saved.
+         * @throws IOException If an I/O error occurs while writing the file.
+         */
         try (Writer writer = new FileWriter("src/main/java/org/example/pharmacy.json")) {
             Map<String, Object> pharmacyData = new HashMap<>();
             pharmacyData.put("name", pharmacy.getName());
             pharmacyData.put("address", pharmacy.getAddress());
 
-            // Save product list
             List<Map<String, Object>> productData = new ArrayList<>();
             for (Product product : pharmacy.getProductList()) {
                 Map<String, Object> productMap = new HashMap<>();
@@ -34,7 +51,6 @@ public class Data implements Serializable {
             }
             pharmacyData.put("productList", productData);
 
-            // Save orderList
             List<Map<String, Object>> orderData = new ArrayList<>();
             for (Order order : pharmacy.getOrderList()) {
                 Map<String, Object> orderMap = new HashMap<>();
@@ -50,7 +66,6 @@ public class Data implements Serializable {
             }
             pharmacyData.put("orderList", orderData);
 
-            // Save orderSold
             List<Map<String, Object>> orderSoldData = new ArrayList<>();
             for (Order order : pharmacy.getOrderSold()) {
                 Map<String, Object> orderMap = new HashMap<>();
@@ -66,7 +81,6 @@ public class Data implements Serializable {
             }
             pharmacyData.put("orderSold", orderSoldData);
 
-            // Write to the file
             gson.toJson(pharmacyData, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,6 +88,26 @@ public class Data implements Serializable {
     }
 
     public static Pharmacy loadPharmacy() {
+        /**
+         * Loads a Pharmacy object from a JSON file.
+         *
+         * This method reads the JSON file located at "src/main/java/org/example/pharmacy.json",
+         * deserializes its contents, and reconstructs a Pharmacy object, including its name,
+         * address, product list, pending orders, and sold orders. Orders are reconstructed by
+         * retrieving product references using their names.
+         *
+         * The JSON structure includes:
+         * - "name": The name of the pharmacy.
+         * - "address": The address of the pharmacy.
+         * - "productList": A list of products available in the pharmacy.
+         * - "orderList": A list of pending orders, including product names and their quantities.
+         * - "orderSold": A list of completed orders, also including product details.
+         *
+         * If the file is not found, a new Pharmacy object with default values is returned.
+         *
+         * @return The reconstructed Pharmacy object, or null if an I/O error occurs.
+         */
+
         try (Reader reader = new FileReader("src/main/java/org/example/pharmacy.json")) {
             JsonObject pharmacyJson = gson.fromJson(reader, JsonObject.class);
 
@@ -81,7 +115,6 @@ public class Data implements Serializable {
             String address = pharmacyJson.get("address").getAsString();
             Pharmacy pharmacy = new Pharmacy(name, address);
 
-            // Load product list
             JsonArray productArray = pharmacyJson.getAsJsonArray("productList");
             for (JsonElement productElement : productArray) {
                 JsonObject productJson = productElement.getAsJsonObject();
@@ -94,7 +127,6 @@ public class Data implements Serializable {
                 pharmacy.addProductWithoutSaving(productName, price, quantity, category);
             }
 
-            // Load orderList
             JsonArray orderArray = pharmacyJson.getAsJsonArray("orderList");
             for (JsonElement orderElement : orderArray) {
                 JsonObject orderJson = orderElement.getAsJsonObject();
@@ -120,7 +152,6 @@ public class Data implements Serializable {
                 pharmacy.getOrderList().add(order);
             }
 
-            // Load orderSold
             JsonArray orderSoldArray = pharmacyJson.has("orderSold") ? pharmacyJson.getAsJsonArray("orderSold") : null;
             if (orderSoldArray != null) {
                 for (JsonElement orderSoldElement : orderSoldArray) {
@@ -158,27 +189,34 @@ public class Data implements Serializable {
         }
     }
 
-
     private static void loadUsers() {
+        /**
+         * Loads users from a JSON file.
+         *
+         * This method reads the JSON file located at "src/main/java/org/example/users.json",
+         * deserializes its contents, and reconstructs a list of User objects with the goal of adding or removing to it.
+         * Each user entry includes a name, password, and role (defaulting to "client" if missing).
+         *
+         * If a required field (name or password) is missing, the user is skipped,
+         * and an error message is displayed.
+         *
+         * @throws IOException If an I/O error occurs while reading the file.
+         */
         try (FileReader reader = new FileReader("src/main/java/org/example/users.json")) {
-            JsonArray userArray = gson.fromJson(reader, JsonArray.class);  // Récupère un tableau JSON
+            JsonArray userArray = gson.fromJson(reader, JsonArray.class);
 
-            // Parse chaque utilisateur et ajoute-les à la liste
             for (JsonElement element : userArray) {
                 JsonObject userObj = element.getAsJsonObject();
 
-                // Utilisation de get() pour éviter le NullPointerException
                 String name = userObj.has("name") ? userObj.get("name").getAsString() : null;
                 String password = userObj.has("password") ? userObj.get("password").getAsString() : null;
                 String role = userObj.has("role") ? userObj.get("role").getAsString() : "client"; // Valeur par défaut
 
-                // Vérification des valeurs récupérées
                 if (name == null || password == null) {
                     System.out.println("Erreur : un ou plusieurs champs sont manquants pour un utilisateur.");
-                    continue;  // Ignorer cet utilisateur et passer au suivant
+                    continue;
                 }
 
-                // Création d'un utilisateur en fonction de son rôle
                 User user = createUserFromJson(name, password, role);
                 users.add(user);
             }
@@ -189,6 +227,19 @@ public class Data implements Serializable {
     }
 
     private static User createUserFromJson(String name, String password, String role) {
+        /**
+         * Creates a User object from JSON data.
+         *
+         * This method takes user details (name, password, and role) and returns
+         * a corresponding User object of type Admin, Client, or Employee based on the role.
+         * If the role is unrecognized, a JsonParseException is thrown.
+         *
+         * @param name     The name of the user.
+         * @param password The user's password.
+         * @param role     The role of the user ("admin", "client", or "employee").
+         * @return A User object of the appropriate type.
+         * @throws JsonParseException If the role is unknown.
+         */
         if ("admin".equals(role)) {
             return new Admin(name, password);
         } else if ("client".equals(role)) {
@@ -201,6 +252,15 @@ public class Data implements Serializable {
     }
 
     private static void saveUsers() {
+        /**
+         * Saves all users to a JSON file.
+         *
+         * This method serializes the list of users and writes it to the file
+         * "src/main/java/org/example/users.json". Each user entry includes
+         * the name, password, and role.
+         *
+         * @throws IOException If an I/O error occurs while writing the file.
+         */
         try (FileWriter writer = new FileWriter("src/main/java/org/example/users.json")) {
             List<JsonObject> userObjects = new ArrayList<>();
             for (User user : users) {
@@ -219,6 +279,15 @@ public class Data implements Serializable {
     }
 
     public static void saveUser(User user) {
+        /**
+         * Saves a new user to the system.
+         *
+         * This method checks if the username is already taken. If not, the user
+         * is added to the list and a confirmation message
+         * is printed. Otherwise, an error message is displayed.
+         *
+         * @param user The User object to be saved.
+         */
         for (User existingUser : users) {
             if (existingUser.getName().equals(user.getName())) {
                 System.out.println("Error : username " + user.getName() + " already taken.");
@@ -232,11 +301,40 @@ public class Data implements Serializable {
     }
 
     public static void removeUser(String user) {
+        /**
+         * Removes a user from the system.
+         *
+         * This method searches for a user by their username and removes them
+         * from the list if found.
+         *
+         * @param user The username of the user to remove.
+         */
         users.removeIf(existingUser -> existingUser.getName().equals(user));
         saveUsers();
     }
 
     public static void exportSalesReport(Pharmacy p) {
+        /**
+         * Exports the sales report of a pharmacy to a CSV file.
+         *
+         * This method processes the sold orders from the given Pharmacy object to generate
+         * a sales report. It calculates the total quantity sold and revenue for each product,
+         * determines the most sold product, and computes the total revenue. The results are
+         * written to a CSV file named "sales_report.csv".
+         *
+         * The CSV file includes:
+         * - "Product Name": The name of the product.
+         * - "Quantity Sold": The total quantity of the product sold.
+         * - "Revenue": The total revenue generated by the product.
+         *
+         * Additional summary information includes:
+         * - The most sold product and its quantity.
+         * - The total revenue from all sales.
+         *
+         * If no sales data is available, a message is printed, and the method exits without writing a file.
+         *
+         * @param p The Pharmacy object whose sales data will be exported.
+         */
         if (p.getOrderSold().isEmpty()) {
             System.out.println("No sales data available to export.");
             return;
