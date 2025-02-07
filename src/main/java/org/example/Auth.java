@@ -18,7 +18,7 @@ public class Auth {
      users = new ArrayList<>();
     }
 
-    public boolean passwordVerify(String name,String password){
+    public boolean userVerify(String name,String password){
 
         try (FileReader reader = new FileReader("src/main/java/org/example/users.json")) {
             Type listType = new TypeToken<List<UserConnexion>>(){}.getType();

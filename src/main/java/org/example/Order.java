@@ -78,7 +78,16 @@ public abstract class Order {
     public Map<Product, Integer> getOrder() {
         return orderMap;
     }
+    public List<String> getStringOrder(){
+        List<String> StringList =  new ArrayList<>();
 
+        for(Product p : orderMap.keySet()){
+            StringList.add("product : "+p.getName() +" quantity : "+ orderMap.get(p).toString());
+
+        }
+        return StringList;
+
+    }
     public void displayOrder() {
         for (Product p : orderMap.keySet()) {
             System.out.println("Name : " + p.getName() + "  Quantity : " + orderMap.get(p));
