@@ -1,247 +1,298 @@
 package org.example;
 
-import javax.net.ssl.SSLSession;
-import java.security.KeyStore;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-
-        Pharmacy p = new Pharmacy("Pharma", "2 avenue de westphalie");
-
-        p.addProduct("Smecta", 4.99, 2, "Medicine");
-        p.addProduct("Aspirine", 9.99, 10, "Medicine");
-        p.addProduct("Supo ;)", 1.99, 3, "Medicine");
-        p.addProduct("Dentifrice", 4.99, 3, "Hygiene");
-        p.addProduct("Shampoing", 9.99, 2, "Hygiene");
-
-        //p.removeProduct("Smecta");
-
-        //p.displayProducts();
-
-        //p.displayLowStock();
-
-        //p.searchProduct("Smecta");
-        //p.searchProduct("Aspirine");
-        //p.searchProduct("test");
-
-        p.addOrder("standard", "test");
-        p.setProductToOrder("test", "Smecta", 1);
-
-        p.addOrder("emergency", "test2");
-        p.setProductToOrder("test2", "Aspirine", 5);
-
-        p.displayOrders();
-        OrderLog ol = new OrderLog();
-        Order o = new Emergency(p,"order1");
-        o.setOrder("Aspirine",2);
-        o.setOrder("Dentifrice",1);
-        ol.addLog(o);
-        ol.addInLog();
-
         Pharmacy pharmacy = Data.loadPharmacy();
-        Data.loadOrders(pharmacy);
+        UserManager userManager = new UserManager();
+        Auth auth = new Auth();
 
-        //p.displayProducts();
-        pharmacy.displayOrders();
-
-        Admin a = new Admin("monsieurPatate","patate");
-
-        //System.out.println(a.getRoleName());
-        Employee em = new Employee("monsieurbanane","banane");
-        Employee em2 = new Employee("monsieurbanane2","banane2");
-        Admin admin = new Admin("admin","jsp");
-
-
-        UserManager um = new UserManager();
-
-        um.addUser(admin ,em);
-        um.addUser(admin ,em2);
-
-        //um.removeUser(admin, "monsieurbanane");
-        Menu menu = new Menu();
+        Menu menu = new Menu(pharmacy, userManager);
         menu.login();
+
+    }
+
+    private static User login(Auth auth) {
+        Scanner scanner = new Scanner(System.in);
+        String username;
+        String password;
+
+        while (true) {
+            System.out.print("Enter username: ");
+            username = scanner.nextLine();
+            System.out.print("Enter password: ");
+            password = scanner.nextLine();
+
+            // Verify the user login
+            boolean loginSuccessful = auth.userVerify(username, password);
+
+            if (loginSuccessful) {
+                // If login is successful, return the session user (Admin, Employee, Client)
+                return auth.getSession();
+            } else {
+                // If login fails, ask the user to try again
+                System.out.println("Login failed. Please try again.");
+            }
+        }
     }
 }
 
 class Menu {
     private final Scanner scanner = new Scanner(System.in);
-    private Pharmacy pharmacy;
+    private final Pharmacy pharmacy;
+    private final UserManager userManager;
+    private final Auth auth;
+
+    public Menu(Pharmacy pharmacy, UserManager userManager) {
+        this.pharmacy = pharmacy;
+        this.userManager = userManager;
+        this.auth = new Auth();  // Authentication instance
+    }
 
     public void login() {
-        Scanner scanner = new Scanner(System.in);
-        Auth auth = new Auth();
-        do {
-            System.out.println("\n---CONNEXION----");
-            System.out.println("for leave the application write : quit");
-            System.out.print("Enter your username: ");
+        while (true) {
+            System.out.println("\n--- LOGIN ----");
+            System.out.println("Type 'quit' to exit the application.");
+
+            System.out.print("Username: ");
             String username = scanner.nextLine().trim();
-            if(username.equals("quit")){
-                System.out.println("application closed");
-                scanner.close();
-                break;}
-            System.out.println("for leave the application write : quit");
-            System.out.print("Enter your password: ");
+            if (username.equalsIgnoreCase("quit")) {
+                System.out.println("Application closed.");
+                break;
+            }
+
+            System.out.print("Password: ");
             String password = scanner.nextLine().trim();
-            if(password.equals("quit")){
-                System.out.println("application closed");
-                scanner.close();
-                break;}
-            System.out.print("wait for the check ... ");
+            if (password.equalsIgnoreCase("quit")) {
+                System.out.println("Application closed.");
+                break;
+            }
+
             if (auth.userVerify(username, password)) {
-                if (startSession(auth.getSession())){
+                User sessionUser = auth.getSession();
+                if (startSession(sessionUser)) {
                     auth.closeSession();
-                    scanner.close();
                     break;
                 }
                 auth.closeSession();
+            } else {
+                System.out.println("Login failed. Please try again.");
             }
         }
-        while (true);
-
     }
-    private boolean startSession(final User newSession) {
-        pharmacy = new Pharmacy("BigPharma", "2 avenue de westphalie");
 
+    private boolean startSession(User user) {
         int choice;
         do {
-
-            printGlobalMenu(newSession.getRoleName());
+            printGlobalMenu(user.getRoleName());
+            while (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next(); // Clear invalid input
+            }
             choice = scanner.nextInt();
-            mainChoiceHandler(choice, newSession.getRoleName());
-            if(choice == 0){
-                return true;
-            }
-            if(choice == 1){
-                return false;
-            }
+            scanner.nextLine(); // Consume newline
+            if (choice == 1) return false;  // Logout
+            if (choice == 0) return true;   // Exit application
+
+            mainChoiceHandler(choice, user);
         } while (true);
     }
-    private void mainChoiceHandler(int choice,String role ) {
-        int max = 0;
-        if(role.equals("admin")){
-            max = 8;
-        }
-        if(role.equals("employee")){
-            max = 6;
-        }
-        if(role.equals("client")){
-            max = 3;
-        }
 
-        if(choice > max){
-            System.out.println("You don't have the permission");
-        }
+    private void mainChoiceHandler(int choice, User user) {
         switch (choice) {
             case 2:
-                //consult pharmacy list
                 pharmacy.displayProducts();
                 break;
             case 3:
-                //menu for passing order
-                do{
-                    OrderMenu();
-                    System.out.print("Your choice : ");
-                    int entry = scanner.nextInt();
-                    if(menuChoiceHandler(entry)){
-                        break;
-                    }
-                }
-                while(true);
-                System.out.print("name of the product : ");
-
-                System.out.print("Your choice : ");
+                orderMenu();
                 break;
             case 4:
-                //add a product in pharmacy
-                do{
-
-                    System.out.print("Your choice : ");
-                    int entry = scanner.nextInt();
-                    if(menuChoiceHandler(entry)){
-                        break;
-                    }
-                }
-                while(true);
-
+                addProduct();
                 break;
             case 5:
-                //remove a product in pharmacy
+                removeProduct();
                 break;
             case 6:
-                //display product in low quantity
                 pharmacy.displayLowStock();
                 break;
             case 7:
-                //add user
+                addUser(user);
                 break;
             case 8:
-                //remove user
+                removeUser(user);
                 break;
-            case 1:
-                System.out.println("Session disconnection");
-                break;
-            case 0:
-                System.out.println("application closed");
-                break;
-
             default:
                 System.out.println("Invalid choice.");
         }
     }
-    private boolean menuChoiceHandler(int choice) {
+
+    private void addProduct() {
+        System.out.print("Enter product name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter price: ");
+        while (!scanner.hasNextDouble()) {
+            System.out.println("Invalid input. Enter a valid price:");
+            scanner.next();
+        }
+        double price = scanner.nextDouble();
+
+        System.out.print("Enter quantity: ");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Invalid input. Enter a valid quantity:");
+            scanner.next();
+        }
+        int quantity = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        System.out.print("Enter category: ");
+        String category = scanner.nextLine();
+
+        pharmacy.addProduct(name, price, quantity, category);
+    }
+
+    private void removeProduct() {
+        System.out.print("Enter product name or ID to remove: ");
+        String identifier = scanner.next();
+        pharmacy.removeProduct(identifier);
+    }
+
+    private void addUser(User admin) {
+        if (!(admin instanceof Admin)) {
+            System.out.println("Error: Only admins can add users!");
+            return;
+        }
+
+        System.out.print("Enter new username: ");
+        String username = scanner.next();
+
+        System.out.print("Enter password: ");
+        String password = scanner.next();
+
+        System.out.print("Enter role (admin/employee/client): ");
+        String role = scanner.next().toLowerCase();
+
+        User newUser;
+        switch (role) {
+            case "admin":
+                newUser = new Admin(username, password);
+                break;
+            case "employee":
+                newUser = new Employee(username, password);
+                break;
+            case "client":
+                newUser = new Client(username, password);
+                break;
+            default:
+                System.out.println("Invalid role!");
+                return;
+        }
+
+        userManager.addUser(newUser);
+        System.out.println("User added successfully.");
+    }
+
+    private void removeUser(User admin) {
+        if (!(admin instanceof Admin)) {
+            System.out.println("Error: Only admins can remove users!");
+            return;
+        }
+
+        System.out.print("Enter username to remove: ");
+        String username = scanner.next();
+        userManager.removeUser(username);
+        System.out.println("User removed successfully.");
+    }
+
+    private void orderMenu() {
+        int choice;
+        do {
+            System.out.println("\n--- Order Menu ---");
+            System.out.println("1. Create an order");
+            System.out.println("2. Add product to order");
+            System.out.println("3. Remove product from order");
+            System.out.println("4. Validate and save order");
+            System.out.println("5. Export sales data");
+            System.out.println("0. Back to main menu");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Enter a number.");
+                scanner.next();
+            }
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            if (choice == 0) return;
+
+            handleOrderChoice(choice);
+        } while (true);
+    }
+
+    private void handleOrderChoice(int choice) {
         switch (choice) {
             case 1:
+                System.out.print("Enter order name: ");
+                String orderName = scanner.nextLine();
+                System.out.print("Enter order type (standard/emergency): ");
+                String orderType = scanner.nextLine();
+                pharmacy.addOrder(orderType, orderName);
                 break;
             case 2:
+                System.out.print("Enter order name: ");
+                String orderNameToAdd = scanner.nextLine();
+                System.out.print("Enter product name: ");
+                String productName = scanner.nextLine();
+                System.out.print("Enter quantity: ");
+                while (!scanner.hasNextInt()) {
+                    System.out.println("Invalid input. Enter a valid quantity:");
+                    scanner.next();
+                }
+                int quantityToAdd = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                pharmacy.setProductToOrder(pharmacy, orderNameToAdd, productName, quantityToAdd);
                 break;
             case 3:
+                System.out.print("Enter order name: ");
+                String orderNameToRemove = scanner.nextLine();
+                System.out.print("Enter product name: ");
+                String productToRemove = scanner.nextLine();
+                pharmacy.removeProductFromOrder(orderNameToRemove, productToRemove);
                 break;
             case 4:
+                System.out.print("Enter order name to validate: ");
+                String orderToValidate = scanner.nextLine();
+                pharmacy.validateOrder(orderToValidate);
                 break;
-            case 0:
-                return true;
-
+            case 5:
+                Data.exportSalesReport(pharmacy);
+                break;
             default:
                 System.out.println("Invalid choice.");
         }
-        return false;
     }
 
     private void printGlobalMenu(String role) {
-
-        if(role.equals("admin")){
-            printAdminMenu();
-            printEmployeeMenu();
+        System.out.println("\n--- Main Menu ---");
+        if (role.equals("admin")) {
+            System.out.println("--------ADMIN MENU---------");
+            System.out.println("7. Add user");
+            System.out.println("8. Remove user");
+            System.out.println("");
         }
-        if(role.equals("employee")){
-            printEmployeeMenu();
+        if (role.equals("employee") || role.equals("admin")) {
+            System.out.println("--------EMPLOYEE MENU---------");
+            System.out.println("4. Add product to pharmacy");
+            System.out.println("5. Remove product from pharmacy");
+            System.out.println("6. Display low-stock products");
+            System.out.println("");
         }
-        System.out.println("\n--- Main Menu---");
-        System.out.println("3. Menu for passing order");
-        System.out.println("2. Consult Pharmacy list");
-        System.out.println("1. Disconnect from session");
-        System.out.println("0. Left application");
-        System.out.print("Your choice : ");
-    }
-    private void OrderMenu() {
-        System.out.println("\n--- Order menu --");
-        System.out.println("4. validate and save your order");
-        System.out.println("3. Remove a product from the order");
-        System.out.println("2. Add a product from the order");
-        System.out.println("1. Create a order");
-        System.out.println("0. Back to main menu");
-    }
-    private void printAdminMenu() {
-        System.out.println("\n--- Admin Menu ---");
-        System.out.println("8. Remove User");
-        System.out.println("7. Create user");
-    }
-    private void printEmployeeMenu(){
-        System.out.println("\n--- Employee Menu---");
-        System.out.println("6. Display products in low quantity");
-        System.out.println("5. Remove a product in the pharmacy");
-        System.out.println("4. Add a product in the pharmacy");
+        System.out.println("--------MAIN MENU---------");
+        System.out.println("1. Logout");
+        System.out.println("2. View products");
+        System.out.println("3. Order Menu");
+        System.out.println("0. Exit application");
+        System.out.println("");
+        System.out.print("Your choice: ");
     }
 }

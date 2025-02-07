@@ -7,24 +7,14 @@ public class UserManager {
 
     private  Set<User> users = new HashSet<>();
 
-    public void addUser(User user, User newUser) {
-
-        if ( user instanceof Admin ) {
-            users.add(newUser);
-            Data.saveUser(newUser);
-        } else {
-            System.out.println("Error, Only admins can add users!");
-        }
+    public void addUser(User newUser) {
+        users.add(newUser);
+        Data.saveUser(newUser);
     }
 
-    public void removeUser(User user, String username) {
-
-        if ( user instanceof Admin) {
-            users.removeIf(u -> u.getName().equals(username));
-            Data.removeUser(username);
-        } else {
-            System.out.println("Error, Only admins can remove users!");
-        }
+    public void removeUser(String username) {
+        users.removeIf(u -> u.getName().equals(username));
+        Data.removeUser(username);
     }
 
     public void displayUsers(User user) {

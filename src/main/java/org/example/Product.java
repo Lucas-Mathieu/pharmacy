@@ -1,15 +1,14 @@
 package org.example;
 
 public class Product {
-    private static int nextId = 1;
     private int id;
     private String name;
     private double price;
     private int quantity;
     private Category category;
 
-    public Product(String name, double price, int quantity, String categoryName) {
-        this.id = nextId++;
+    public Product(int id,String name, double price, int quantity, String categoryName) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
