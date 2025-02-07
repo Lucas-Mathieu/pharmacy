@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Scanner;
-import java.io.FileWriter;
-import java.io.IOException;
 
-public class Pharmacy extends Data implements Stockable {
+public class Pharmacy implements Stockable {
     private String name;
     private String address;
     public List<Product> productList;
@@ -20,6 +18,15 @@ public class Pharmacy extends Data implements Stockable {
         this.productList = new ArrayList<>();
         this.orderList = new ArrayList<>();
         this.orderSold = new ArrayList<>();
+    }
+
+    @Override
+    public void addProduct(String productName, double price, int quantity, String category) {
+        this.productList.add(
+                new Product(getNewId(), productName, price, quantity, category)
+        );
+        Data.savePharmacy(this);
+        System.out.println(productName + " has been successfully added.");
     }
 
     public List<Order> getOrderList() {
@@ -50,24 +57,14 @@ public class Pharmacy extends Data implements Stockable {
         if (productList.isEmpty()) {
             return 1;
         } else {
-            return productList.get(productList.size() - 1).getId() + 1; // Corrected index
+            return productList.get(productList.size() - 1).getId() + 1;
         }
-    }
-
-    @Override
-    public void addProduct(String productName, double price, int quantity, String category) {
-        this.productList.add(
-                new Product(getNewId(), productName, price, quantity, category)
-        );
-        Data.savePharmacy(this);
-        System.out.println(productName + " has been successfully added.");
     }
 
     public void addProductWithoutSaving(String productName, double price, int quantity, String category) {
         this.productList.add(
                 new Product(getNewId(), productName, price, quantity, category)
         );
-        // Do not call savePharmacy here to avoid resetting orderList
         System.out.println(productName + " has been successfully added.");
     }
 
@@ -122,7 +119,6 @@ public class Pharmacy extends Data implements Stockable {
             }
         }
 
-        //sorting algorithm by insertion
         for (int i = 1; i < lowStockProducts.size(); i++) {
             Product currentProduct = lowStockProducts.get(i);
             int j = i - 1;
@@ -220,7 +216,6 @@ public class Pharmacy extends Data implements Stockable {
                 return;
         }
 
-        // Add the order to the order list
         this.orderList.add(order);
         Data.savePharmacy(this);
         System.out.println("The " + orderType + " order has been added.");

@@ -210,7 +210,7 @@ public class Data implements Serializable {
 
                 String name = userObj.has("name") ? userObj.get("name").getAsString() : null;
                 String password = userObj.has("password") ? userObj.get("password").getAsString() : null;
-                String role = userObj.has("role") ? userObj.get("role").getAsString() : "client"; // Valeur par défaut
+                String role = userObj.has("role") ? userObj.get("role").getAsString() : "client";
 
                 if (name == null || password == null) {
                     System.out.println("Erreur : un ou plusieurs champs sont manquants pour un utilisateur.");
