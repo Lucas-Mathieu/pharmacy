@@ -7,11 +7,6 @@ public class Employee extends User implements Role {
     }
 
     @Override
-    public String getPassword() {
-        return "";
-    }
-
-    @Override
     public String getRoleName() {
         return "employee";
     }
