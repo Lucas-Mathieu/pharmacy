@@ -4,19 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Pharmacy extends Data implements Stockable {
     private String name;
     private String address;
-    private List<Product> productList;
+    public List<Product> productList;
     private List<Order> orderList;
+    private List<Order> orderSold;
 
     public Pharmacy(String name, String address) {
         this.name = name;
         this.address = address;
         this.productList = new ArrayList<>();
         this.orderList = new ArrayList<>();
-        Data.savePharmacy(this);
+        this.orderSold = new ArrayList<>();
+    }
+
+    public List<Order> getOrderList() {
+        return orderList;
     }
 
     public String getName() {
@@ -35,14 +42,35 @@ public class Pharmacy extends Data implements Stockable {
         this.address = address;
     }
 
+    public List<Order> getOrderSold() {
+        return orderSold;
+    }
+
+    public int getNewId() {
+        if (productList.isEmpty()) {
+            return 1;
+        } else {
+            return productList.get(productList.size() - 1).getId() + 1; // Corrected index
+        }
+    }
+
     @Override
     public void addProduct(String productName, double price, int quantity, String category) {
         this.productList.add(
-                new Product(productName, price, quantity, category)
+                new Product(getNewId(), productName, price, quantity, category)
         );
         Data.savePharmacy(this);
         System.out.println(productName + " has been successfully added.");
     }
+
+    public void addProductWithoutSaving(String productName, double price, int quantity, String category) {
+        this.productList.add(
+                new Product(getNewId(), productName, price, quantity, category)
+        );
+        // Do not call savePharmacy here to avoid resetting orderList
+        System.out.println(productName + " has been successfully added.");
+    }
+
 
     @Override
     public void removeProduct(String identifier) {
@@ -194,7 +222,7 @@ public class Pharmacy extends Data implements Stockable {
 
         // Add the order to the order list
         this.orderList.add(order);
-        Data.saveOrders(orderList);
+        Data.savePharmacy(this);
         System.out.println("The " + orderType + " order has been added.");
     }
 
@@ -202,7 +230,7 @@ public class Pharmacy extends Data implements Stockable {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 orderList.remove(order);
-                Data.saveOrders(orderList);
+                Data.savePharmacy(this);
                 System.out.println("Order '" + orderName + "' has been removed.");
                 return;
             }
@@ -221,11 +249,22 @@ public class Pharmacy extends Data implements Stockable {
         }
     }
 
-    public void setProductToOrder(String orderName, String productName, int quantity) {
+    public void displayOrdersSold() {
+        if (orderSold.isEmpty()) {
+            System.out.println("No orders found.");
+        } else {
+            for (Order order : orderSold) {
+                System.out.println("Order Name: " + order.getName() + " | Urgent: " + order.isUrgent());
+                order.displayOrder();
+            }
+        }
+    }
+
+    public void setProductToOrder(Pharmacy p,String orderName, String productName, int quantity) {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
-                order.setOrder(productName, quantity);
-                Data.saveOrders(orderList);
+                order.setOrder(p, productName, quantity);
+                Data.savePharmacy(this);
                 return;
             }
         }
@@ -236,7 +275,7 @@ public class Pharmacy extends Data implements Stockable {
         for (Order order : orderList) {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 order.removeProductOrder(productName);
-                Data.saveOrders(orderList);
+                Data.savePharmacy(this);
                 return;
             }
         }
@@ -248,10 +287,16 @@ public class Pharmacy extends Data implements Stockable {
             if (order.getName().equalsIgnoreCase(orderName)) {
                 order.validation();
                 this.orderList.remove(order);
-                Data.saveOrders(orderList);
+                this.orderSold.add(order);
+                Data.savePharmacy(this);
+                System.out.println("Order '" + orderName + "' has been validated and moved to orderSold.");
                 return;
             }
         }
         System.out.println("Order with name '" + orderName + "' not found.");
+    }
+
+    public void genStats() {
+        Data.exportSalesReport(this);
     }
 }

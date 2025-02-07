@@ -4,6 +4,10 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        Pharmacy p = Data.loadPharmacy();
+        p.displayOrdersSold();
+        p.genStats();
+
         /*
         Pharmacy p = new Pharmacy("Pharma-caca", "2 avenue de westphalie");
 
@@ -12,6 +16,7 @@ public class Main {
         p.addProduct("Supo ;)", 1.99, 3, "Medicine");
         p.addProduct("Dentifrice", 4.99, 3, "Hygiene");
         p.addProduct("Shampoing", 9.99, 2, "Hygiene");
+        */
 
         //p.removeProduct("Smecta");
 
@@ -23,39 +28,37 @@ public class Main {
         //p.searchProduct("Aspirine");
         //p.searchProduct("test");
 
+        /*
         p.addOrder("standard", "test");
-        p.setProductToOrder("test", "Smecta", 1);
-
+        p.setProductToOrder(p, "test", "Smecta", 1);
         p.addOrder("emergency", "test2");
-        p.setProductToOrder("test2", "Aspirine", 5);
-
-        p.displayOrders();
+        p.setProductToOrder(p, "test2", "Aspirine", 5);
         */
 
-        Pharmacy pharmacy = Data.loadPharmacy();
-        Data.loadOrders(pharmacy);
 
         //p.displayProducts();
-        pharmacy.displayOrders();
+        //p.displayOrders();
 
-        Admin a = new Admin("monsieurPatate","patate");
-        UserConnexion u = new UserConnexion("t","t");
+        //Admin a = new Admin("monsieurPatate","patate");
+        //UserConnexion u = new UserConnexion("t","t");
 
         //System.out.println(a.getRoleName());
-        Employee em = new Employee("monsieurbanane","banane");
-        Employee em2 = new Employee("monsieurbanane2","banane2");
-        Admin admin = new Admin("admin","jsp");
+        //Employee em = new Employee("monsieurbanane","banane");
+        //Employee em2 = new Employee("monsieurbanane2","banane2");
+        //Admin admin = new Admin("admin","jsp");
 
 
-        UserManager um = new UserManager();
-        Scanner scanner = new Scanner(System.in);
-        Auth auth = new Auth();
+        //UserManager um = new UserManager();
+        //Scanner scanner = new Scanner(System.in);
+        //Auth auth = new Auth();
 
-        um.addUser(admin ,em);
-        um.addUser(admin ,em2);
+        //um.addUser(admin ,em);
+        //um.addUser(admin ,em2);
+
 
         //um.removeUser(admin, "monsieurbanane");
 
+        /*
         while (true) {
             System.out.print("Enter username: ");
             String username = scanner.nextLine();  // Read username
@@ -63,6 +66,6 @@ public class Main {
             String password = scanner.nextLine();
             System.out.print("wait for the check ... ");
             auth.passwordVerify(username,password);
-        }
+        }*/
     }
 }
